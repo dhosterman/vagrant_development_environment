@@ -1,0 +1,92 @@
+--- # Base install playbook
+- hosts: all
+  become: yes
+  become_method: sudo
+  vars:
+    base_dir: /home/vagrant
+#    python_versions:
+#      - 2.6.9
+#      - 2.7.12
+#      - 3.3.6
+#      - 3.4.5
+#      - 3.5.2
+#      - 3.6.0
+#    go_version: 1.7.4
+
+  tasks:
+
+  - name: update repositories and install git
+    apt:
+      name: git
+      state: latest
+      update_cache: yes
+
+  - name: install vim
+    apt:
+      name: vim
+      state: latest
+
+  - name: install screen
+    apt:
+      name: screen
+      state: latest
+
+  - name: install emacs
+    apt:
+      name: emacs24
+      state: latest
+
+  - name: install the silver searcher
+    apt:
+      name: silversearcher-ag
+      state: latest
+  
+  - name: install spacemacs
+    become: true
+    become_user: vagrant
+    git:
+      repo: "https://github.com/syl20bnr/spacemacs"
+      dest: "{{ base_dir }}/.emacs.d"
+
+  - name: clone dotfiles
+    git:
+      repo: "https://github.com/dhosterman/vagrant_dotfiles"
+      dest: "{{ base_dir }}/.dotfiles"
+      update: yes
+
+  - name: create symlinks for dotfiles
+    file:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: vagrant
+      group: vagrant
+      state: link
+      force: yes
+    with_items:
+      - { src: "{{ base_dir }}/.dotfiles/.bashrc", dest: "{{ base_dir }}/.bashrc" }
+      - { src: "{{ base_dir }}/.dotfiles/.spacemacs", dest: "{{ base_dir }}/.spacemacs" }
+      - { src: "{{ base_dir }}/.dotfiles/.gitconfig", dest: "{{ base_dir }}/.gitconfig" }
+      - { src: "{{ base_dir }}/.dotfiles/.gitignore_global", dest: "{{ base_dir }}/.gitignore_global" }
+      - { src: "{{ base_dir }}/.dotfiles/ssh_config", dest: "{{ base_dir }}/.ssh/config" }
+
+  - name: create development directories
+    file:
+      path: "{{ item }}"
+      owner: vagrant
+      group: vagrant
+      state: directory
+    with_items:
+      - "{{ base_dir }}/dev"
+      - "{{ base_dir }}/dev/src/github.com/dhosterman"
+      - "{{ base_dir }}/dev/src/gitlab.com/dhosterman"
+      - "{{ base_dir }}/dev/bin"
+      - "{{ base_dir }}/dev/etc"
+      - "{{ base_dir }}/dev/doc"
+
+  # install python development environment
+  - include: tasks/python.yml
+    when: python_versions is defined
+  
+  # install go development environment
+  - include: tasks/go.yml
+    when: go_version is defined

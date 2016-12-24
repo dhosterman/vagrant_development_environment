@@ -1,0 +1,21 @@
+--- # Go environment installation tasks
+
+- name: install go
+  unarchive:
+    src: "https://storage.googleapis.com/golang/go{{ go_version }}.linux-amd64.tar.gz"
+    dest: /usr/local
+    remote_src: yes
+
+- name: fetch spacemacs go layer requirements
+  become: true
+  become_user: vagrant
+  command: "/usr/local/go/bin/go get -u -v {{ item }}"
+  environment:
+    GOPATH: "{{ base_dir }}/dev"
+  with_items:
+    - github.com/nsf/gocode
+    - github.com/rogpeppe/godef
+    - golang.org/x/tools/cmd/guru
+    - golang.org/x/tools/cmd/gorename
+    - golang.org/x/tools/cmd/goimports
+  
