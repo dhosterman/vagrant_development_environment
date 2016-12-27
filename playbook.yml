@@ -12,6 +12,7 @@
 #      - 3.5.2
 #      - 3.6.0
 #    go_version: 1.7.4
+    postgresql: true
 
   tasks:
 
@@ -40,6 +41,12 @@
     apt:
       name: silversearcher-ag
       state: latest
+
+  - name: install postgresql if required
+    apt:
+      name: postgresql
+      state: latest
+    when: postgresql is defined
   
   - name: install spacemacs
     become: true
@@ -90,3 +97,4 @@
   # install go development environment
   - include: tasks/go.yml
     when: go_version is defined
+
