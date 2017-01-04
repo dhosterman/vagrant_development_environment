@@ -20,6 +20,7 @@
     - libmpdec-dev
     - libldap2-dev
     - libsasl2-dev
+    - libaio-dev
     - python-dev
     - python-pip
 
