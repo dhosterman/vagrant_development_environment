@@ -18,6 +18,9 @@
     - libgdbm-dev 
     - libffi-dev 
     - libmpdec-dev
+    - libldap2-dev
+    - libsasl2-dev
+    - python-dev
     - python-pip
 
 - name: pip install pew
