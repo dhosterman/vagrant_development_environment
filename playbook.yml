@@ -21,6 +21,13 @@
       name: git
       state: latest
       update_cache: yes
+      
+  # necessary to work around a bug    
+  - name: cleanup dotfiles
+    become: yes
+    file:
+      path: "{{ base_dir }}/.dotfiles"
+      state: absent
   
   - name: clone dotfiles
     git:
