@@ -4,7 +4,7 @@
   become_method: sudo
   vars:
     base_dir: /home/vagrant
-#    python_versions:
+    python_versions:
 #      - 2.6.9
 #      - 2.7.13
 #      - 3.3.6
@@ -13,6 +13,7 @@
 #      - 3.6.0
 #    go_version: 1.7.4
 #    postgresql: true
+#    docker: true
 
   tasks:
 
@@ -21,19 +22,6 @@
       name: git
       state: latest
       update_cache: yes
-      
-  # necessary to work around a bug    
-  - name: cleanup dotfiles
-    become: yes
-    file:
-      path: "{{ base_dir }}/.dotfiles"
-      state: absent
-  
-  - name: clone dotfiles
-    git:
-      repo: "https://github.com/dhosterman/vagrant_dotfiles"
-      dest: "{{ base_dir }}/.dotfiles"
-      force: yes
 
   - name: install vim
     apt:
@@ -67,6 +55,18 @@
     git:
       repo: "https://github.com/syl20bnr/spacemacs"
       dest: "{{ base_dir }}/.emacs.d"
+
+  - name: cleanup dotfiles
+    become: yes
+    file:
+      path: "{{ base_dir }}/.dotfiles"
+      state: absent
+
+  - name: clone dotfiles
+    git:
+      repo: "https://github.com/dhosterman/vagrant_dotfiles"
+      dest: "{{ base_dir }}/.dotfiles"
+      force: yes
 
   - name: create symlinks for dotfiles
     file:
@@ -104,4 +104,8 @@
   # install go development environment
   - include: tasks/go.yml
     when: go_version is defined
+
+  # install docker
+  - include: tasks/docker.yml
+    when: docker is defined
 

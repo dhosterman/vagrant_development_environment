@@ -1,0 +1,41 @@
+--- # Docker installation tasks
+
+- name: Install required packages for Docker
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - software-properties-common
+
+- name: Get Docker GPG key
+  shell: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
+
+- name: Add Docker repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+    state: present
+
+- name: Install Docker
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: yes
+
+- name: add vagrant user to docker group
+  user:
+    name: vagrant
+    group: docker
+
+- name: install docker-compose
+  get_url:
+    dest: /usr/local/bin/docker-compose
+    url: https://github.com/docker/compose/releases/download/1.11.2/docker-compose-Linux-x86_64
+
+- name: make docker-compose executable
+  file:
+    dest: /usr/local/bin/docker-compose
+    mode: a+x

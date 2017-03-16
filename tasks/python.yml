@@ -26,13 +26,12 @@
 
 - name: pip install pew
   pip:
-    name: pew
+    name: "{{ item }}"
     state: latest
-
-- name: pip install cookiecutter
-  pip:
-    name: cookiecutter
-    state: latest
+  with_items:
+  - pip
+  - pew
+  - cookiecutter
 
 - name: install python versions
   command: "pew install {{ item }}"
